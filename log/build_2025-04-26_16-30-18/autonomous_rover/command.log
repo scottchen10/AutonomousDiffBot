@@ -1,0 +1,6 @@
+Invoking command in '/home/ws/build/autonomous_rover': CMAKE_PREFIX_PATH=/opt/ros/jazzy /usr/bin/cmake /home/ws/src/autonomous_rover -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/ws/install/autonomous_rover
+Invoked command in '/home/ws/build/autonomous_rover' returned '0': CMAKE_PREFIX_PATH=/opt/ros/jazzy /usr/bin/cmake /home/ws/src/autonomous_rover -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/ws/install/autonomous_rover
+Invoking command in '/home/ws/build/autonomous_rover': CMAKE_PREFIX_PATH=/opt/ros/jazzy /usr/bin/cmake --build /home/ws/build/autonomous_rover -- -j6 -l6
+Invoked command in '/home/ws/build/autonomous_rover' returned '0': CMAKE_PREFIX_PATH=/opt/ros/jazzy /usr/bin/cmake --build /home/ws/build/autonomous_rover -- -j6 -l6
+Invoking command in '/home/ws/build/autonomous_rover': CMAKE_PREFIX_PATH=/opt/ros/jazzy /usr/bin/cmake --install /home/ws/build/autonomous_rover
+Invoked command in '/home/ws/build/autonomous_rover' returned '0': CMAKE_PREFIX_PATH=/opt/ros/jazzy /usr/bin/cmake --install /home/ws/build/autonomous_rover
