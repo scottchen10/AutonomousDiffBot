@@ -19,6 +19,9 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y python3-pip
 ENV SHELL /bin/bash
 
+RUN apt-get update && apt-get install -y ros-jazzy-ros2-control \
+    ros-jazzy-ros2-controllers 
+
 # ********************************************************
 # * Anything else you want to do like clean up goes here *
 # ********************************************************

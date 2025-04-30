@@ -1,1 +1,0 @@
-/home/ws/build/autonomous_rover/ament_cmake_core/autonomous_roverConfig-version.cmake
