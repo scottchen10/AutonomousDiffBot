@@ -25,9 +25,6 @@ RUN apt-get update && apt-get install -y ros-jazzy-ros2-control \
     python3-pytest \
     python3-catkin-pkg
 
-RUN git config --global user.name "Scott Chen" &&
-    git config --user.email "scottchen227@gmail.com"
-
 # ********************************************************
 # * Anything else you want to do like clean up goes here *
 # ********************************************************
