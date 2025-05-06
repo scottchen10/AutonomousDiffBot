@@ -23,7 +23,13 @@ RUN apt-get update && apt-get install -y ros-jazzy-ros2-control \
     ros-jazzy-ros2-controllers \
     ros-jazzy-ros2-control-cmake \
     python3-pytest \
-    python3-catkin-pkg
+    python3-catkin-pkg \
+    ros-jazzy-joint-state-publisher \
+    ros-jazzy-joint-state-publisher-gui \
+    ros-jazzy-xacro \
+    ros-jazzy-ros-gz \
+    ros-jazzy-gz-ros2-control \
+    ros-jazzy-joy* 
 
 # ********************************************************
 # * Anything else you want to do like clean up goes here *
