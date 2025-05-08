@@ -24,7 +24,7 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY launch description worlds
+  DIRECTORY launch description worlds hardware
   DESTINATION share/${PROJECT_NAME}
 )
 
