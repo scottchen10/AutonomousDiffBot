@@ -15,6 +15,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   pluginlib
   rclcpp
   rclcpp_lifecycle
+  libgpiod2t64
 )
 
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
@@ -23,9 +24,9 @@ endforeach()
 
 ## COMPILE
 add_library(
-  autonomous_diff_bot
+  differential_drive_interface
   SHARED
-  hardware/diffbot_system.cpp
+  hardware/differential_drive_interface.cpp
 )
 target_compile_features(autonomous_diff_bot PUBLIC cxx_std_17)
 target_include_directories(autonomous_diff_bot PUBLIC

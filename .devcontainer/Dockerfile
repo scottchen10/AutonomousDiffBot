@@ -29,7 +29,8 @@ RUN apt-get update && apt-get install -y ros-jazzy-ros2-control \
     ros-jazzy-xacro \
     ros-jazzy-ros-gz \
     ros-jazzy-gz-ros2-control \
-    ros-jazzy-joy* 
+    ros-jazzy-joy* \
+    libgpiod-dev gpiod
 
 # ********************************************************
 # * Anything else you want to do like clean up goes here *
