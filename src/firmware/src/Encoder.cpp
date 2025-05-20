@@ -1,6 +1,9 @@
 #include "Encoder.hpp"
 
-Encoder::Encoder(uint8_t pinPulseA, uint8_t pinPulseB): pinPulseA(pinPulseA), pinPulseB(pinPulseB) {};
+Encoder::Encoder(uint8_t pinPulseA, uint8_t pinPulseB): pinPulseA(pinPulseA), pinPulseB(pinPulseB) {
+    lastUpdateTime = (double)micros() * 1e-6;
+    this->setup();
+};
 
 void Encoder::setup() {
     pinMode(pinPulseA, INPUT);
@@ -23,7 +26,7 @@ void Encoder::updatePulses() {
     }
 
     angle = pulses * PI/(MOTOR_RATIO * PULSE_PER_REV);
-    angularVel = (angle - lastAngle)/(deltaTime * 10^6);
+    angularVel = (angle - lastAngle)/((double)deltaTime * 1e-6);
 
     lastUpdateTime = currTime;
 }

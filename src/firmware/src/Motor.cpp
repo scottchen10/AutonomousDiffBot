@@ -6,15 +6,17 @@ void Motor::setup() {
 }
 
 Motor::Motor(Encoder* encoder, double wheelRadius, uint8_t pinInputA, uint8_t pinInputB)
-    :encoder(encoder), wheelRadius(wheelRadius), pinInputA(pinInputA), pinInputB(pinInputB) {
-        this->setup();
-    }
+    :encoder(encoder), wheelRadius(wheelRadius), pinInputA(pinInputA), pinInputB(pinInputB) 
+{
+    motorPid = new PIDController(1, 0, 0); 
+    this->setup();
+}
 
-void Motor::setAngVel(double angVel) {
+void Motor::setTargetAngVel(double angVel) {
     cmdAngVel = angVel;
 }
 
-void Motor::setMotorSpeed(int16_t power) {
+void Motor::setMotorPower(int16_t power) {
     bool isFWD = power > 0 ? true: false;
 
     if (power == 0) {
@@ -30,5 +32,9 @@ void Motor::setMotorSpeed(int16_t power) {
 }
 
 void Motor::update() {
+    double error = cmdAngVel - encoder->getAngularVel();
+    motorPid->updateError(error);
+    double responseFactor = motorPid->getResponse();
 
+    this->setMotorPower(responseFactor * 255);
 }

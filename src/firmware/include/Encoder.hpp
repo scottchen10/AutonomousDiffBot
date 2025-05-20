@@ -7,13 +7,12 @@
 
 #define DEFINE_ENCODER_ISR(name, pinPulseA, pinPulseB)                         \
     Encoder* name = nullptr;                                                   \
-    void isr_##name()  {                                                                         \
+    void isr_##name()  {                                                        \
         if (name)                                                           \
             name->updatePulses();                                           \
     }                                                                          \
-    void setup_##name() {                                                                          \
+    void setup_##name() {                                                      \
         name = new Encoder(pinPulseA, pinPulseB);                              \
-        name->setup();                                                         \
         attachInterrupt(digitalPinToInterrupt(pinPulseA), isr_##name, RISING); \
     }
 
