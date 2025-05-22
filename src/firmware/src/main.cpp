@@ -4,14 +4,14 @@
 #include "Encoder.hpp"
 #include "Motor.hpp"
 
-DEFINE_ENCODER_ISR(leftEncoder, 2, A1)
-DEFINE_ENCODER_ISR(rightEncoder, 3, A3)
+DEFINE_ENCODER_ISR(leftEncoder, 2, A2)
+DEFINE_ENCODER_ISR(rightEncoder, 3, A0)
 
 Motor* leftMotor = nullptr;
 Motor* rightMotor = nullptr;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   setup_leftEncoder();
   setup_rightEncoder();
 
@@ -19,18 +19,16 @@ void setup() {
   rightMotor = new Motor(rightEncoder, 1, 5, 6);
 };
 
-
-
 void loop() {
   if (Serial.available()) {
     String json = Serial.readStringUntil('\n');
 
-    StaticJsonDocument<128> doc;
+    JsonDocument doc;
     DeserializationError err = deserializeJson(doc, json);
-
+    JsonDocument resp;
+    
     if (!err) {
       String cmd = doc["cmd"];
-      StaticJsonDocument<128> resp;
       resp["resp"] = cmd;
       
       if (cmd == "GET") {
@@ -39,6 +37,8 @@ void loop() {
         
         if (property == "ANGULARVEL") {
           resp["value"] = encoder->getAngularVel();
+        } else if (property == "ANGLE") {
+          resp["value"] = encoder->getAngle();
         }
       } else if (cmd == "SET") {
         Motor* motor = doc["target"] == "LEFT" ? leftMotor: rightMotor;
@@ -51,15 +51,16 @@ void loop() {
       } else if (cmd == "STATUS") {
         resp["value"] = "OKAY";
       } else {
-        resp["value"] = "BAD CMD";
+        resp["value"] = "BAD CMD " + cmd;
       }
 
-
-      serializeJson(resp, Serial);
-      Serial.println();
+    } else {
+      resp["resp"] = "UNKNOWN";
+      resp["value"] = "BAD";
     }
+    serializeJson(resp, Serial);
+    Serial.println();
   }
-
   leftMotor->update();
   rightMotor->update();
 };

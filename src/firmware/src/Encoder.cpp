@@ -15,8 +15,8 @@ void Encoder::updatePulses() {
     int pulseB = digitalRead(pinPulseB);
 
     double lastAngle = angle;
-    unsigned long currTime = micros();
-    unsigned long deltaTime = currTime - lastUpdateTime;
+    double currTime = (double)micros()* 1e-6;
+    double deltaTime = currTime - lastUpdateTime;
     
 
     if (pulseA != pulseB) {
@@ -26,7 +26,7 @@ void Encoder::updatePulses() {
     }
 
     angle = pulses * PI/(MOTOR_RATIO * PULSE_PER_REV);
-    angularVel = (angle - lastAngle)/((double)deltaTime * 1e-6);
+    angularVel = (angle - lastAngle)/(deltaTime);
 
     lastUpdateTime = currTime;
 }

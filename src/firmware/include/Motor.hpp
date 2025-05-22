@@ -15,7 +15,7 @@ public:
 
 private:
     double wheelRadius;
-    double cmdAngVel;
+    double cmdAngVel = 0;
     Encoder* encoder;
     PIDController* motorPid; 
 
