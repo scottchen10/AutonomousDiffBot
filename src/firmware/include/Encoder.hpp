@@ -5,31 +5,23 @@
 #define PULSE_PER_REV 11.0
 #define MOTOR_RATIO 21.3
 
-#define DEFINE_ENCODER_ISR(name, pinPulseA, pinPulseB)                         \
-    Encoder* name = nullptr;                                                   \
-    void isr_##name()  {                                                        \
-        if (name)                                                           \
-            name->updatePulses();                                           \
-    }                                                                          \
-    void setup_##name() {                                                      \
-        name = new Encoder(pinPulseA, pinPulseB);                              \
-        attachInterrupt(digitalPinToInterrupt(pinPulseA), isr_##name, RISING); \
-    }
-
 class Encoder {
 public:
     double getAngle();
+    double getDeltaAngle();
     double getAngularVel();
-    void updatePulses();
+    void update();
+    void onInterruptUpdate();
     void setup();
     Encoder(uint8_t pinPulseA, uint8_t pinPulseB);
+    uint8_t pinPulseA;
+    uint8_t pinPulseB;
 
-private:
+    private:
     int pulses = 0;
     double angle = 0;
     double angularVel = 0;
-    unsigned long lastUpdateTime = 0;
-    uint8_t pinPulseA;
-    uint8_t pinPulseB;
+    double lastAngle = 0;
+    double lastUpdateTime = 0;
 
 };

@@ -10,25 +10,34 @@ void Encoder::setup() {
     pinMode(pinPulseB, INPUT);
 }
 
-void Encoder::updatePulses() {
+void Encoder::update() {
+    double currTime = (double)millis() * 1e-3;
+
+    if (abs(currTime - lastUpdateTime) < 0.02) {
+        return;
+    }
+
+    double deltaTime = currTime - lastUpdateTime;
+    angularVel = (angle - lastAngle)/(deltaTime);
+
+    lastUpdateTime = currTime;
+    lastAngle = angle;
+}
+
+void Encoder::onInterruptUpdate() {
     int pulseA = digitalRead(pinPulseA);
     int pulseB = digitalRead(pinPulseB);
-
-    double lastAngle = angle;
-    double currTime = (double)micros()* 1e-6;
-    double deltaTime = currTime - lastUpdateTime;
     
-
     if (pulseA != pulseB) {
         pulses--;
     } else {
         pulses++;
     }
 
-    angle = pulses * PI/(MOTOR_RATIO * PULSE_PER_REV);
-    angularVel = (angle - lastAngle)/(deltaTime);
-
-    lastUpdateTime = currTime;
+    angle = pulses * TWO_PI/(MOTOR_RATIO * PULSE_PER_REV);
+}
+double Encoder::getDeltaAngle() {
+    return angle;
 }
 
 double Encoder::getAngle() {

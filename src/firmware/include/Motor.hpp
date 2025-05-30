@@ -11,15 +11,15 @@ public:
     void update();
 
     void setMotorPower(int16_t power);
-    Motor(Encoder* encoder, double wheelRadius, uint8_t pinInputA, uint8_t pinInputB);
+    void setMotorPower(int16_t power, bool brake);
 
-private:
     double wheelRadius;
-    double cmdAngVel = 0;
-    Encoder* encoder;
     PIDController* motorPid; 
-
     uint8_t pinInputA;
     uint8_t pinInputB;
 
+    Motor(Encoder* encoder, double wheelRadius, uint8_t pinInputA, uint8_t pinInputB);
+private:
+    double cmdAngVel = 0;
+    Encoder* encoder;
 };

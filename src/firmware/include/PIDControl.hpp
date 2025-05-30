@@ -8,8 +8,14 @@ public:
     volatile double integralError = 0;
     volatile double lastUpdateTime = 0;
 
+    void updateTuning(double kp, double ki, double kd) {
+        this->kp = kp;
+        this->ki = ki;
+        this->kd = kd;
+    };
+
     void updateError(double error) {
-        double currentTime = (double)micros() * 1e6;
+        double currentTime = (double)micros() * 1e-6;
         double deltaTime = currentTime - lastUpdateTime;
 
         integralError += deltaTime * error;
