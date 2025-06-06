@@ -133,9 +133,13 @@ void setup() {
 
   leftEncoder = new Encoder(2, A2);                              
   rightEncoder = new Encoder(3, A3);     
+  leftEncoder->setup();
+  rightEncoder->setup();
 
-  leftMotor = new Motor(leftEncoder, 1, 11, 10);
-  rightMotor = new Motor(rightEncoder, 1, 6, 5);
+  leftMotor = new Motor(leftEncoder, 11, 10);
+  rightMotor = new Motor(rightEncoder, 6, 5);
+  leftMotor->setup();
+  rightMotor->setup();
 
   attachInterrupt(digitalPinToInterrupt(leftEncoder->pinPulseA), isr_leftEncoder, RISING); 
   attachInterrupt(digitalPinToInterrupt(rightEncoder->pinPulseA), isr_rightEncoder, RISING); 

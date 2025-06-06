@@ -9,7 +9,6 @@ Motor::Motor(Encoder* encoder, double wheelRadius, uint8_t pinInputA, uint8_t pi
     :encoder(encoder), wheelRadius(wheelRadius), pinInputA(pinInputA), pinInputB(pinInputB) 
 {
     motorPid = new PIDController(0.15, 0.12, 0.0005); 
-    this->setup();
 }
 
 void Motor::setTargetAngVel(double angVel) {
