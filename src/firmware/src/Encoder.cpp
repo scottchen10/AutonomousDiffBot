@@ -1,7 +1,7 @@
 #include "Encoder.hpp"
 
 Encoder::Encoder(uint8_t pinPulseA, uint8_t pinPulseB): pinPulseA(pinPulseA), pinPulseB(pinPulseB) {
-    lastUpdateTime = (double)millis() * 1e-6;
+    lastUpdateTime = (double)millis() * 1e-3;
 };
 
 void Encoder::setup() {
@@ -11,12 +11,12 @@ void Encoder::setup() {
 
 void Encoder::update() {
     double currentTime = (double)millis() * 1e-3;
+    double deltaTime = currentTime - lastUpdateTime;
 
-    if (abs(currentTime - lastUpdateTime) < 0.02) {
+    if (deltaTime < 0.02) {
         return;
     }
 
-    double deltaTime = currentTime - lastUpdateTime;
     angularVel = (angle - lastAngle)/(deltaTime);
 
     lastUpdateTime = currentTime;

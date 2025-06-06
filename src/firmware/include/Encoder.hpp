@@ -18,7 +18,7 @@ public:
     uint8_t pinPulseB;
 
 private:
-    volatile int pulses = 0;
+    volatile int32_t pulses = 0;
     volatile double angle = 0;
     volatile double angularVel = 0;
     volatile double lastAngle = 0;

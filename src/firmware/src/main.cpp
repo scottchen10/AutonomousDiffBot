@@ -45,6 +45,7 @@ String cmd_get_motor(char * token) {
   String property;
 
   Encoder * encoder = nullptr;
+  Motor* motor = nullptr;
 
   if (not getNextToken(&token, &side))
     return String("resp:malformed-cmd");
@@ -54,8 +55,10 @@ String cmd_get_motor(char * token) {
 
   if (side.equals("l")) {
     encoder = leftEncoder;
+    motor = leftMotor;
   } else if (side.equals("r")) {
     encoder = rightEncoder;
+    motor = rightMotor;
   } else {
     return BAD_CMD;
   }
@@ -64,6 +67,16 @@ String cmd_get_motor(char * token) {
     return String("resp:angle ") + side + String(" ") + String(encoder->getAngle(), 3);
   } else if (property.equals("angular_vel")) {
     return String("resp:angular_vel ") + side + String(" ") + String(encoder->getAngularVel(), 3);
+  } else if (property.equals("abs_angle")) {
+    return String("resp:abs_angle ") + side + String(" ") + String(encoder->getDeltaAngle(), 3);
+  } else if (property.equals("error")) {
+    PIDController* pidcontrol = motor->motorPid;
+
+    return String("resp:error ") 
+      + side + String(" ") 
+      + String(pidcontrol->error, 3) + String(" ") 
+      + String(pidcontrol->integralError, 3) + String(" ") 
+      + String(pidcontrol->derivativeError, 3);
   }
   return BAD_CMD;
 }
