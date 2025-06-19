@@ -15,8 +15,12 @@ public:
     };
 
     void updateError(double error) {
-        double currentTime = (double)micros() * 1e-6;
+        double currentTime = (double)millis() * 1e-3;
         double deltaTime = currentTime - lastUpdateTime;
+
+        if (abs(deltaTime) < 0.02) {
+            return;
+        }
 
         integralError += deltaTime * error;
         derivativeError = (error - this->error)/deltaTime;
@@ -28,7 +32,7 @@ public:
         return constrain((kp * error + ki * integralError + kd * derivativeError), -1.0, 1.0);
     };
     PIDController(double kp, double ki, double kd): kp(kp), ki(ki), kd(kd) {
-        lastUpdateTime = (double)micros() * 1e-6;
+        lastUpdateTime = (double)millis() * 1e-3;
     }
 
 private:

@@ -17,11 +17,11 @@ public:
     uint8_t pinPulseA;
     uint8_t pinPulseB;
 
-    private:
-    int pulses = 0;
-    double angle = 0;
-    double angularVel = 0;
-    double lastAngle = 0;
-    double lastUpdateTime = 0;
+private:
+    volatile int32_t pulses = 0;
+    volatile double angle = 0;
+    volatile double angularVel = 0;
+    volatile double lastAngle = 0;
+    volatile double lastUpdateTime = 0;
 
 };
