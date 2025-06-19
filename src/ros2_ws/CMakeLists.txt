@@ -15,8 +15,9 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   pluginlib
   rclcpp
   rclcpp_lifecycle
-  libgpiod2t64
 )
+
+add_subdirectory(serial)
 
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
@@ -27,6 +28,7 @@ add_library(
   differential_drive_interface
   SHARED
   hardware/differential_drive_interface.cpp
+  src/serial
 )
 target_compile_features(autonomous_diff_bot PUBLIC cxx_std_17)
 target_include_directories(autonomous_diff_bot PUBLIC

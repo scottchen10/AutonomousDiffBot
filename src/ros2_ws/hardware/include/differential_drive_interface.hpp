@@ -46,6 +46,8 @@ namespace differential_drive_interface
   private:
     Wheel left_wheel;
     Wheel right_wheel;
+    
+    serial::Serial serial_port;
   };
 
 }

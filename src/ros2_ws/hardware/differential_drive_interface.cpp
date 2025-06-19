@@ -8,11 +8,29 @@
 #include <memory>
 #include <sstream>
 #include <vector>
-
-#include "gpiod.h"
+#include <string>
+ 
 #include "hardware_interface/lexical_casts.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "serial.h"
+
+std::vector<std::string> split(const char *str, char c = ' ')
+{
+    std::vector<std::string> result;
+
+    do
+    {
+        const char *begin = str;
+
+        while(*str != c && *str)
+            str++;
+
+        result.push_back(std::string(begin, str));
+    } while (0 != *str++);
+
+    return result;
+}
 
 namespace differential_drive_interface
 {
@@ -20,7 +38,6 @@ namespace differential_drive_interface
 std::vector<hardware_interface::StateInterface::ConstSharedPtr> DifferentialDriveInterface::on_export_state_interfaces() {
   std::vector<hardware_interface::StateInterface::ConstSharedPtr> state_interfaces;
 
-  // export states for both wheels
   for (int joint_index = 0; joint_index < 1; ++joint_index) {
     Wheel* wheel = joint_index == 0 ? &left_wheel: &right_wheel;
 
@@ -52,6 +69,7 @@ hardware_interface::CallbackReturn DifferentialDriveInterface::on_init(
   left_wheel = Wheel("left_wheel_joint", 44);
   right_wheel = Wheel("right_wheel_joint", 44);
 
+  
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -66,8 +84,10 @@ hardware_interface::CallbackReturn DifferentialDriveInterface::on_configure(
   {
     set_command(name, 0.0);
   }
-  RCLCPP_INFO(get_logger(), "Successfully configured!");
 
+  serial_port.setPort("/dev/ttyAMA1");
+  serial_port.setBaudrate(115200);
+  serial_port.open();
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -92,12 +112,35 @@ hardware_interface::CallbackReturn DifferentialDriveInterface::on_deactivate(
 
   RCLCPP_INFO(get_logger(), "Successfully deactivated!");
 
+  serial_port.close(); 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
 hardware_interface::return_type DifferentialDriveInterface::read(
     const rclcpp::Time & time, const rclcpp::Duration &period)
 {
+  int lineCount = 0;
+  while (serial_port.available() && lineCount < 1000) {
+      std::string line = serial_port.readline(1024, "\n");
+      std::vector<std::string> tokens = split(line.c_str(), ' ');
+
+      if (tokens.size() < 4)
+        continue;
+
+      std::string response_title = tokens[0];
+      std::string side = tokens[1];
+      std::string angle = tokens[2];
+      std::string angular_vel = tokens[3];
+
+
+      if (response_title == "resp:angle_angular_vel") 
+      {
+        Wheel wheel = side == "r" ? right_wheel: left_wheel;
+        wheel.position = std::stod(angle);
+        wheel.velocity = std::stod(angular_vel);
+      }
+      lineCount++;
+  }
 
   return hardware_interface::return_type::OK;
 }
@@ -105,6 +148,12 @@ hardware_interface::return_type DifferentialDriveInterface::read(
 hardware_interface::return_type DifferentialDriveInterface::write(
     const rclcpp::Time & time, const rclcpp::Duration & period)
 {
+  for (const auto & [name, descr] : joint_command_interfaces_)
+  {
+    serial_port.write("cmd:get_motor r angle_angular_vel" + '\n');
+    serial_port.write("cmd:get_motor l angle_angular_vel" + '\n');
+    set_state(name, get_command(name));
+  }
 
   return hardware_interface::return_type::OK;
 }
