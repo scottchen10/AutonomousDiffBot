@@ -47,11 +47,8 @@ String cmd_get_motor(char * token) {
   Encoder * encoder = nullptr;
   Motor* motor = nullptr;
 
-  if (not getNextToken(&token, &side))
-    return String("resp:malformed-cmd");
-
-  if (not getNextToken(&token, &property))
-    return String("resp:malformed-cmd");
+  if (!getNextToken(&token, &side) || !getNextToken(&token, &property))
+    return BAD_CMD;
 
   if (side.equals("l")) {
     encoder = leftEncoder;
@@ -63,21 +60,29 @@ String cmd_get_motor(char * token) {
     return BAD_CMD;
   }
 
+  String respHeader = String("resp:") + property + String(" ") + side + String(" ");
+
   if (property.equals("angle")) {
-    return String("resp:angle ") + side + String(" ") + String(encoder->getAngle(), 3);
+    return respHeader + String(encoder->getAngle(), 3);
   } else if (property.equals("angular_vel")) {
-    return String("resp:angular_vel ") + side + String(" ") + String(encoder->getAngularVel(), 3);
+    return respHeader + String(encoder->getAngularVel(), 3);
+  } else if (property.equals("angle_angular_vel")) {
+    return respHeader
+      + String(encoder->getDeltaAngle(), 3) + String(" ")
+      + String(encoder->getAngularVel(), 3);
+  } else if (property.equals("angular_vel")) {
+    return respHeader + String(encoder->getAngularVel(), 3);
   } else if (property.equals("abs_angle")) {
-    return String("resp:abs_angle ") + side + String(" ") + String(encoder->getDeltaAngle(), 3);
+    return respHeader + String(encoder->getDeltaAngle(), 3);
   } else if (property.equals("error")) {
     PIDController* pidcontrol = motor->motorPid;
 
-    return String("resp:error ") 
-      + side + String(" ") 
+    return respHeader
       + String(pidcontrol->error, 3) + String(" ") 
       + String(pidcontrol->integralError, 3) + String(" ") 
       + String(pidcontrol->derivativeError, 3);
   }
+
   return BAD_CMD;
 }
 
@@ -89,13 +94,7 @@ String cmd_set_motor(char * token) {
 
   Motor * motor = nullptr;
 
-  if (not getNextToken(&token, &side))
-    return String("resp:malformed-cmd");
-
-  if (not getNextToken(&token, &property))
-    return String("resp:malformed-cmd");
-
-  if (not getNextToken(&token, &value))
+  if (!getNextToken(&token, &side) || !getNextToken(&token, &property) || !getNextToken(&token, &value))
     return String("resp:malformed-cmd");
 
   if (side.equals("l")) {
@@ -114,9 +113,9 @@ String cmd_set_motor(char * token) {
     String kd;
 
     if (not getNextToken(&token, &ki))
-      return String("resp:malformed-cmd");
+      return BAD_CMD;
     if (not getNextToken(&token, &kd))
-      return String("resp:malformed-cmd");
+      return BAD_CMD;
 
     motor->motorPid->updateTuning(value.toDouble(), ki.toDouble(), kd.toDouble());
     return String("resp:okay");
@@ -167,7 +166,7 @@ void loop() {
       String result = parseCommand(command);
       Serial.println(result);
     } else {
-      Serial.println("resp:bad-cmd");
+      Serial.println(BAD_CMD);
     }   
   }
 
