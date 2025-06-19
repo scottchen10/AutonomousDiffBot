@@ -1,0 +1,3 @@
+[submodule "src/ros2_ws/src/serial"]
+	path = src/ros2_ws/src/serial
+	url = https://github.com/wjwwood/serial.git
