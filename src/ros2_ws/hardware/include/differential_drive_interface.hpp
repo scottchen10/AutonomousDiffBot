@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+
 #include "wheel.hpp"
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
@@ -15,6 +16,9 @@
 #include "rclcpp/time.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
+#include "libserial/SerialPort.h"
+
+using namespace LibSerial;
 
 namespace differential_drive_interface
 {
@@ -43,11 +47,11 @@ namespace differential_drive_interface
     hardware_interface::return_type write(
         const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
-  private:
+  private: 
     Wheel left_wheel;
     Wheel right_wheel;
     
-    serial::Serial serial_port;
+    SerialPort serial_port;
   };
 
 }

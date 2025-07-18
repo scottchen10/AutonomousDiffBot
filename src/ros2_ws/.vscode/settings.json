@@ -80,6 +80,7 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "any": "cpp",
-        "coroutine": "cpp"
+        "coroutine": "cpp",
+        "expected": "cpp"
     }
 }

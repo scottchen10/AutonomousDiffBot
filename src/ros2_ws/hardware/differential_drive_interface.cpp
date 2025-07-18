@@ -1,5 +1,3 @@
-#include "differential_drive_interface.hpp"
-
 #include <chrono>
 #include <cmath>
 #include <cstddef>
@@ -9,11 +7,12 @@
 #include <sstream>
 #include <vector>
 #include <string>
- 
+
 #include "hardware_interface/lexical_casts.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "serial.h"
+
+#include "differential_drive_interface.hpp"
 
 std::vector<std::string> split(const char *str, char c = ' ')
 {
@@ -85,7 +84,7 @@ hardware_interface::CallbackReturn DifferentialDriveInterface::on_configure(
     set_command(name, 0.0);
   }
 
-  serial_port.setPort("/dev/ttyAMA1");
+  serial_port.setDevice("/dev/ttyAMA1");
   serial_port.setBaudrate(115200);
   serial_port.open();
   return hardware_interface::CallbackReturn::SUCCESS;
