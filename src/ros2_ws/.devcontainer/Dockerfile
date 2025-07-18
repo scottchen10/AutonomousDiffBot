@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install -y ros-jazzy-ros2-control \
     ros-jazzy-ros-gz \
     ros-jazzy-gz-ros2-control \
     ros-jazzy-joy* \
-    libboost-all-dev
+    libserial-dev
 
 # ********************************************************
 # * Anything else you want to do like clean up goes here *

@@ -13,7 +13,6 @@
 #include "hardware_interface/lexical_casts.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
-#include "serial.h"
 
 std::vector<std::string> split(const char *str, char c = ' ')
 {
@@ -65,9 +64,6 @@ hardware_interface::CallbackReturn DifferentialDriveInterface::on_init(
   {
     return hardware_interface::CallbackReturn::ERROR;
   }
-
-  left_wheel = Wheel("left_wheel_joint", 44);
-  right_wheel = Wheel("right_wheel_joint", 44);
 
   
   return hardware_interface::CallbackReturn::SUCCESS;
