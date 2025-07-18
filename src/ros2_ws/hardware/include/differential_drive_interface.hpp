@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+
 #include "wheel.hpp"
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
@@ -15,16 +16,19 @@
 #include "rclcpp/time.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
+#include "libserial/SerialPort.h"
+
+using namespace LibSerial;
 
 namespace differential_drive_interface
 {
   class DifferentialDriveInterface : public hardware_interface::SystemInterface
   {
   public:
+
+    DifferentialDriveInterface() = default;
     RCLCPP_SHARED_PTR_DEFINITIONS(DifferentialDriveInterface)
-
-    std::vector<hardware_interface::StateInterface::ConstSharedPtr> on_export_state_interfaces() override;
-
+    
     hardware_interface::CallbackReturn on_init(
         const hardware_interface::HardwareInfo &info) override;
 
@@ -43,11 +47,11 @@ namespace differential_drive_interface
     hardware_interface::return_type write(
         const rclcpp::Time &time, const rclcpp::Duration &period) override;
 
-  private:
-    Wheel left_wheel;
-    Wheel right_wheel;
+  private: 
+    Wheel left_wheel = Wheel("left_wheel", 100);
+    Wheel right_wheel = Wheel("right_wheel", 100);
     
-    serial::Serial serial_port;
+    SerialPort serial_port;
   };
 
 }

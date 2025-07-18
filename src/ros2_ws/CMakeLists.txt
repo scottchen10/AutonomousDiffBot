@@ -17,8 +17,6 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp_lifecycle
 )
 
-add_subdirectory(serial)
-
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
@@ -28,20 +26,25 @@ add_library(
   differential_drive_interface
   SHARED
   hardware/differential_drive_interface.cpp
-  src/serial
 )
-target_compile_features(autonomous_diff_bot PUBLIC cxx_std_17)
-target_include_directories(autonomous_diff_bot PUBLIC
+target_compile_features(differential_drive_interface PUBLIC cxx_std_17)
+target_include_directories(differential_drive_interface PUBLIC
 $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/include>
-$<INSTALL_INTERFACE:include/autonomous_diff_bot>
+$<INSTALL_INTERFACE:include/differential_drive_interface>
+/usr/include
 )
 ament_target_dependencies(
-  autonomous_diff_bot PUBLIC
+  differential_drive_interface PUBLIC
   ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
 
+target_link_libraries(differential_drive_interface
+  PUBLIC
+  serial
+)
+
 # Export hardware plugins
-pluginlib_export_plugin_description_file(hardware_interface autonomous_diff_bot.xml)
+pluginlib_export_plugin_description_file(hardware_interface hardware_plugin.xml)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -60,9 +63,16 @@ install(
   DESTINATION include/autonomous_diff_bot
 )
 
+install(TARGETS differential_drive_interface
+  EXPORT export_differential_drive_interface
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 install(
-  DIRECTORY launch description worlds
+  DIRECTORY launch description hardware
   DESTINATION share/${PROJECT_NAME}
 )
-
+ament_export_targets(export_differential_drive_interface HAS_LIBRARY_TARGET)
+ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_package()
