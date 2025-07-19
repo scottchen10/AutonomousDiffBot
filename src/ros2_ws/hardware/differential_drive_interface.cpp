@@ -13,6 +13,7 @@
 #include "rclcpp/rclcpp.hpp"
 
 #include "differential_drive_interface.hpp"
+#include "libserial/SerialPortConstants.h"
 
 std::vector<std::string> split(const char *str, char c = ' ')
 {
@@ -34,27 +35,6 @@ std::vector<std::string> split(const char *str, char c = ' ')
 namespace differential_drive_interface
 {
 
-std::vector<hardware_interface::StateInterface::ConstSharedPtr> DifferentialDriveInterface::on_export_state_interfaces() {
-  std::vector<hardware_interface::StateInterface::ConstSharedPtr> state_interfaces;
-
-  for (int joint_index = 0; joint_index < 1; ++joint_index) {
-    Wheel* wheel = joint_index == 0 ? &left_wheel: &right_wheel;
-
-    state_interfaces.emplace_back(
-      std::make_shared<hardware_interface::StateInterface>(
-        info_.joints[joint_index].name, hardware_interface::HW_IF_POSITION, &wheel->position
-      )
-    );
-    state_interfaces.emplace_back(
-      std::make_shared<hardware_interface::StateInterface>(
-        info_.joints[joint_index].name, hardware_interface::HW_IF_VELOCITY, &wheel->velocity
-      )
-    );  
-  }
-
-  return state_interfaces;
-}
-
 hardware_interface::CallbackReturn DifferentialDriveInterface::on_init(
   const hardware_interface::HardwareInfo &info)
 {
@@ -65,28 +45,32 @@ hardware_interface::CallbackReturn DifferentialDriveInterface::on_init(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
-  left_wheel = Wheel("left_wheel_joint", 44);
-  right_wheel = Wheel("right_wheel_joint", 44);
-
-  
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
 hardware_interface::CallbackReturn DifferentialDriveInterface::on_configure(
     const rclcpp_lifecycle::State & /*previous_state*/)
 {
+  auto logger = rclcpp::get_logger("DifferentialDriveInterface");
+
   for (const auto &[name, descr] : joint_state_interfaces_)
   {
+    RCLCPP_INFO(logger, name.c_str());
     set_state(name, 0.0);
+
   }
   for (const auto &[name, descr] : joint_command_interfaces_)
   {
     set_command(name, 0.0);
   }
 
-  serial_port.setDevice("/dev/ttyAMA1");
-  serial_port.setBaudrate(115200);
-  serial_port.open();
+  try {
+    serial_port.Open("/dev/ttyAMA1");
+  } catch (const LibSerial::OpenFailed& e) {
+    RCLCPP_ERROR(logger, "Failed to open serial port %s: %s", "/dev/ttyAMA1", e.what());
+    throw;
+  }
+  serial_port.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -111,7 +95,7 @@ hardware_interface::CallbackReturn DifferentialDriveInterface::on_deactivate(
 
   RCLCPP_INFO(get_logger(), "Successfully deactivated!");
 
-  serial_port.close(); 
+  serial_port.Close(); 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -119,9 +103,14 @@ hardware_interface::return_type DifferentialDriveInterface::read(
     const rclcpp::Time & time, const rclcpp::Duration &period)
 {
   int lineCount = 0;
-  while (serial_port.available() && lineCount < 1000) {
-      std::string line = serial_port.readline(1024, "\n");
+  size_t bytesAvailable = serial_port.GetNumberOfBytesAvailable();
+  
+  while (bytesAvailable > 0 && lineCount < 1000) {
+      std::string line;
+      serial_port.ReadLine(line, '\n', 20);
       std::vector<std::string> tokens = split(line.c_str(), ' ');
+      bytesAvailable = serial_port.GetNumberOfBytesAvailable();
+      lineCount++;
 
       if (tokens.size() < 4)
         continue;
@@ -131,15 +120,18 @@ hardware_interface::return_type DifferentialDriveInterface::read(
       std::string angle = tokens[2];
       std::string angular_vel = tokens[3];
 
-
       if (response_title == "resp:angle_angular_vel") 
       {
-        Wheel wheel = side == "r" ? right_wheel: left_wheel;
-        wheel.position = std::stod(angle);
-        wheel.velocity = std::stod(angular_vel);
+        Wheel* wheel = side == "r" ? &right_wheel: &left_wheel;
+        wheel->position = std::stod(angle);
+        wheel->velocity = std::stod(angular_vel);
       }
-      lineCount++;
   }
+
+  set_state("left_wheel_joint/position", left_wheel.position);
+  set_state("left_wheel_joint/velocity", left_wheel.velocity);
+  set_state("right_wheel_joint/position", right_wheel.position);
+  set_state("right_wheel_joint/velocity", right_wheel.velocity);
 
   return hardware_interface::return_type::OK;
 }
@@ -147,13 +139,18 @@ hardware_interface::return_type DifferentialDriveInterface::read(
 hardware_interface::return_type DifferentialDriveInterface::write(
     const rclcpp::Time & time, const rclcpp::Duration & period)
 {
-  for (const auto & [name, descr] : joint_command_interfaces_)
-  {
-    serial_port.write("cmd:get_motor r angle_angular_vel" + '\n');
-    serial_port.write("cmd:get_motor l angle_angular_vel" + '\n');
-    set_state(name, get_command(name));
-  }
+  std::string command = "";
 
+  double left_speed = get_command("left_wheel_joint/velocity");
+  double right_speed = get_command("right_wheel_joint/velocity");
+
+  serial_port.Write("cmd:set_motor l angular_vel 5.0" + '\n');
+  // serial_port.Write("cmd:set_motor l " + std::to_string(left_speed) + "\n");
+  serial_port.Write("cmd:set_motor r angular_vel " + std::to_string(right_speed) + "\n");
+  serial_port.Write("cmd:get_motor r angle_angular_vel" + '\n');
+  serial_port.Write("cmd:get_motor l angle_angular_vel" + '\n');
+
+  // serial_port.Write(command);
   return hardware_interface::return_type::OK;
 }
 

@@ -1,5 +1,5 @@
 {
-    "cmake.sourceDirectory": "/home/ws",
+    "cmake.sourceDirectory": "/home/scottchen10/AutonomousDiffBot/src/ros2_ws",
     "python.analysis.extraPaths": [
         "/opt/ros/jazzy/lib/python3.12/site-packages"
     ],

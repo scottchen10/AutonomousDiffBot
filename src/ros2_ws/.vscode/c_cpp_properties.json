@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/opt/ros/jazzy/include/**",
+                "${workspaceFolder}/src"
                 "/usr/include/"
             ],
             "defines": [],
