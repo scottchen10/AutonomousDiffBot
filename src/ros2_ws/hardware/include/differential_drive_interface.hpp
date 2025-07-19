@@ -52,7 +52,6 @@ namespace differential_drive_interface
   private: 
     Wheel left_wheel = Wheel("left_wheel", 100);
     Wheel right_wheel = Wheel("right_wheel", 100);
-    
     SerialPort serial_port;
   };
 
