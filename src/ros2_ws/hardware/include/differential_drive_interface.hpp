@@ -27,6 +27,8 @@ namespace differential_drive_interface
   public:
 
     DifferentialDriveInterface() = default;
+
+    DifferentialDriveInterface() = default;
     RCLCPP_SHARED_PTR_DEFINITIONS(DifferentialDriveInterface)
     
     hardware_interface::CallbackReturn on_init(
