@@ -22,7 +22,8 @@
                 "ms-azuretools.vscode-docker",
                 "ms-vscode.cpptools-extension-pack",
                 "ms-iot.vscode-ros",
-                "redhat.vscode-xml"
+                "redhat.vscode-xml",
+                "ms-vscode.vscode-serial-monitor"
             ]
         }
     },
@@ -41,5 +42,5 @@
        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
        "source=/dev/dri,target=/dev/dri,type=bind,consistency=cached"
     ],
-    "postCreateCommand": "sudo rosdep fix-permissions && rosdep update && sudo rosdep install --from-paths src --ignore-src -y && sudo chown -R $(whoami) /home/ws/"
-}
+    "postCreateCommand": "sudo rosdep fix-permissions && rosdep update && sudo chown -R $(whoami) /home/ws/"
+} 

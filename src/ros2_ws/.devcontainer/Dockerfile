@@ -19,6 +19,9 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y python3-pip
 ENV SHELL /bin/bash
 
+# Add permission to access Serial Port
+RUN usermod -aG dialout ${USERNAME}
+
 RUN apt-get update && apt-get install -y ros-jazzy-ros2-control \
     ros-jazzy-ros2-controllers \
     ros-jazzy-ros2-control-cmake \
@@ -30,7 +33,8 @@ RUN apt-get update && apt-get install -y ros-jazzy-ros2-control \
     ros-jazzy-ros-gz \
     ros-jazzy-gz-ros2-control \
     ros-jazzy-joy* \
-    libgpiod-dev gpiod
+    libserial-dev \
+    ros-jazzy-teleop-twist-keyboard
 
 # ********************************************************
 # * Anything else you want to do like clean up goes here *

@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="diffbot" params="prefix"/>
+
     <xacro:include filename="inertial_macros.xacro"/>
     <xacro:include filename="robot_definitions.xacro"/>
-
+    
     <!-- BASE LINK -->
     <link name="base_link"> </link>
 
@@ -45,7 +47,7 @@
         <child link="left_wheel"/>
         <origin xyz="0 ${wheel_offset_y} 0" rpy="-${pi/2} 0 0" />
         <axis xyz="0 0 1"/>
-        <limit effort="500.0" velocity="10"/>
+        <limit effort="500.0" velocity="0"/>
         <dynamics damping="1.0" friction="1.0"/>
     </joint>
 
@@ -77,7 +79,7 @@
         <child link="right_wheel"/>
         <origin xyz="0 ${-wheel_offset_y} 0" rpy="${pi/2} 0 0" />
         <axis xyz="0 0 -1"/>
-        <limit effort="500.0" velocity="10"/>
+        <limit effort="500.0" velocity="0"/>
         <dynamics damping="1.0" friction="1.0"/>
     </joint>
 
