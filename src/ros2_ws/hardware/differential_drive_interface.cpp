@@ -100,31 +100,35 @@ hardware_interface::CallbackReturn DifferentialDriveInterface::on_deactivate(
 }
 
 hardware_interface::return_type DifferentialDriveInterface::read(
-    const rclcpp::Time & time, const rclcpp::Duration &period)
+    const rclcpp::Time & /*time*/, const rclcpp::Duration &/*period*/)
 {
   int lineCount = 0;
   size_t bytesAvailable = serial_port.GetNumberOfBytesAvailable();
   
   while (bytesAvailable > 0 && lineCount < 1000) {
       std::string line;
-      serial_port.ReadLine(line, '\n', 20);
+      serial_port.ReadLine(line, '\n', 10);
       std::vector<std::string> tokens = split(line.c_str(), ' ');
       bytesAvailable = serial_port.GetNumberOfBytesAvailable();
       lineCount++;
 
       if (tokens.size() < 4)
         continue;
-
+      
       std::string response_title = tokens[0];
       std::string side = tokens[1];
       std::string angle = tokens[2];
       std::string angular_vel = tokens[3];
-
+        
       if (response_title == "resp:angle_angular_vel") 
       {
         Wheel* wheel = side == "r" ? &right_wheel: &left_wheel;
-        wheel->position = std::stod(angle);
-        wheel->velocity = std::stod(angular_vel);
+        try {
+          wheel->position = std::stod(angle);
+          wheel->velocity = std::stod(angular_vel);
+        } catch(const std::invalid_argument&) {
+          RCLCPP_INFO(this->get_logger(), "Invalid angle_angular_vel received, skipping: %s %s", angle.c_str(),  angular_vel.c_str());
+        }
       }
   }
 
@@ -137,20 +141,22 @@ hardware_interface::return_type DifferentialDriveInterface::read(
 }
 
 hardware_interface::return_type DifferentialDriveInterface::write(
-    const rclcpp::Time & time, const rclcpp::Duration & period)
+    const rclcpp::Time & /*time*/, const rclcpp::Duration &/*period*/)
 {
   std::string command = "";
 
   double left_speed = get_command("left_wheel_joint/velocity");
   double right_speed = get_command("right_wheel_joint/velocity");
 
-  serial_port.Write("cmd:set_motor l angular_vel 5.0" + '\n');
-  // serial_port.Write("cmd:set_motor l " + std::to_string(left_speed) + "\n");
-  serial_port.Write("cmd:set_motor r angular_vel " + std::to_string(right_speed) + "\n");
-  serial_port.Write("cmd:get_motor r angle_angular_vel" + '\n');
-  serial_port.Write("cmd:get_motor l angle_angular_vel" + '\n');
+  command.append("cmd:set_motor l angular_vel " + std::to_string(left_speed) + "\n");
+  command.append("cmd:set_motor r angular_vel " + std::to_string(right_speed) + "\n");
+  command.append("cmd:get_motor r angle_angular_vel\n");
+  command.append("cmd:get_motor l angle_angular_vel\n");
 
-  // serial_port.Write(command);
+  serial_port.Write(command);
+  // RCLCPP_INFO(this->get_logger(), "Left speed: %f", left_speed);
+  // RCLCPP_INFO(this->get_logger(), "Right speed: %f", left_speed);
+
   return hardware_interface::return_type::OK;
 }
 

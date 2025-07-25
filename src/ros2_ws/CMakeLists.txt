@@ -15,6 +15,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   pluginlib
   rclcpp
   rclcpp_lifecycle
+  libserial-dev
 )
 
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
@@ -29,14 +30,11 @@ add_library(
 )
 target_compile_features(differential_drive_interface PUBLIC cxx_std_17)
 target_include_directories(differential_drive_interface PUBLIC
-target_compile_features(differential_drive_interface PUBLIC cxx_std_17)
-target_include_directories(differential_drive_interface PUBLIC
 $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/hardware/include>
 $<INSTALL_INTERFACE:include/differential_drive_interface>
 /usr/include
 )
 ament_target_dependencies(
-  differential_drive_interface PUBLIC
   differential_drive_interface PUBLIC
   ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
@@ -47,7 +45,6 @@ target_link_libraries(differential_drive_interface
 )
 
 # Export hardware plugins
-pluginlib_export_plugin_description_file(hardware_interface hardware_plugin.xml)
 pluginlib_export_plugin_description_file(hardware_interface hardware_plugin.xml)
 
 if(BUILD_TESTING)
@@ -62,9 +59,6 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/serial)
-target_link_libraries(differential_drive_interface serial)
-
 install(
   DIRECTORY hardware/include/
   DESTINATION include/autonomous_diff_bot
@@ -76,19 +70,10 @@ install(TARGETS differential_drive_interface
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
-install(TARGETS differential_drive_interface
-  EXPORT export_differential_drive_interface
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-)
 install(
-  DIRECTORY launch description hardware
   DIRECTORY launch description hardware
   DESTINATION share/${PROJECT_NAME}
 )
-ament_export_targets(export_differential_drive_interface HAS_LIBRARY_TARGET)
-ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_export_targets(export_differential_drive_interface HAS_LIBRARY_TARGET)
 ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
 ament_package()
