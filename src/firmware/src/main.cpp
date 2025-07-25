@@ -164,9 +164,13 @@ void loop() {
     if (command.startsWith("cmd")) {
       command = command.substring(4);
       String result = parseCommand(command);
+
+      if (result == BAD_CMD) {
+        result = BAD_CMD + " " + command;
+      }
       Serial.println(result);
     } else {
-      Serial.println(BAD_CMD);
+      Serial.println(BAD_CMD + " " + command);
     }   
   }
 
