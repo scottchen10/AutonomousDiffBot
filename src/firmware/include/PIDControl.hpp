@@ -3,10 +3,10 @@
 
 class PIDController {
 public:
-    volatile double error = 0;
-    volatile double derivativeError = 0;
-    volatile double integralError = 0;
-    volatile double lastUpdateTime = 0;
+    double error = 0;
+    double derivativeError = 0;
+    double integralError = 0;
+    double lastUpdateTime = 0;
 
     void updateTuning(double kp, double ki, double kd) {
         this->kp = kp;
